@@ -1,10 +1,8 @@
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // CORS headers — allow your Vercel domain
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -15,29 +13,30 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: system || "You are an expert resume writer and career coach.",
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    const fullPrompt = system
+      ? `${system}\n\n${prompt}`
+      : prompt;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: { maxOutputTokens: 1000 },
+        }),
+      }
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Anthropic API error:", data);
+      console.error("Gemini API error:", data);
       return res.status(response.status).json({ error: data?.error?.message || "API error" });
     }
 
-    const text = data.content?.map((b) => b.text || "").join("") || "";
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     return res.status(200).json({ text });
 
   } catch (err) {
