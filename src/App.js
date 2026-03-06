@@ -22,15 +22,13 @@ const store = { save:(d)=>{ _memStore=d; }, load:()=>_memStore };
 
 // ── Claude API ───────────────────────────────────────────────────────────────
 const claude = async (prompt, sys="You are an expert resume writer and career coach.") => {
-  const r = await fetch("https://api.anthropic.com/v1/messages",{
+  const r = await fetch("/api/claude",{
     method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      model:"claude-sonnet-4-20250514", max_tokens:1000,
-      system:sys, messages:[{role:"user",content:prompt}]
-    })
+    body:JSON.stringify({ prompt, system:sys })
   });
   const d = await r.json();
-  return d.content?.map(b=>b.text||"").join("")||"";
+  if(d.error) throw new Error(d.error);
+  return d.text||"";
 };
 
 // ── Resume text ───────────────────────────────────────────────────────────────
@@ -495,11 +493,11 @@ Candidate Skills: ${form.skills.join(", ")}`,
             <input style={C.inp(errors.name)} value={form.name} onChange={e=>upd("name",e.target.value)} placeholder="Jane Smith"/>
             {errors.name&&<div style={C.errTxt}>{errors.name}</div>}
           </div>
-          <div style={{...C.g2,marginBottom:13}}>
+          <div className="rai-g2" style={{...C.g2,marginBottom:13}}>
             <div><label style={C.lbl}>Email *</label><input style={C.inp(errors.email)} value={form.email} onChange={e=>upd("email",e.target.value)} placeholder="jane@email.com"/>{errors.email&&<div style={C.errTxt}>{errors.email}</div>}</div>
             <div><label style={C.lbl}>Phone</label><input style={C.inp(false)} value={form.phone} onChange={e=>upd("phone",e.target.value)} placeholder="+1 555 000 1234"/></div>
           </div>
-          <div style={{...C.g3,marginBottom:13}}>
+          <div className="rai-g3" style={{...C.g3,marginBottom:13}}>
             <div><label style={C.lbl}>Location</label><input style={C.inp(false)} value={form.location} onChange={e=>upd("location",e.target.value)} placeholder="New York, USA"/></div>
             <div><label style={C.lbl}>LinkedIn</label><input style={C.inp(false)} value={form.linkedin} onChange={e=>upd("linkedin",e.target.value)} placeholder="linkedin.com/in/jane"/></div>
             <div><label style={C.lbl}>Website</label><input style={C.inp(false)} value={form.website} onChange={e=>upd("website",e.target.value)} placeholder="janesmith.dev"/></div>
@@ -538,7 +536,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
                 <span style={{fontSize:11,fontWeight:700,color:"#818cf8",letterSpacing:"0.5px"}}>POSITION {i+1}</span>
                 {form.experience.length>1&&<button style={{...C.btn("danger"),padding:"3px 10px",fontSize:10}} onClick={()=>remExp(i)}>Remove</button>}
               </div>
-              <div style={{...C.g2,marginBottom:11}}><div><label style={C.lbl}>Company</label><input style={C.inp(false)} value={ex.company} onChange={e=>updExp(i,"company",e.target.value)} placeholder="Acme Corp"/></div><div><label style={C.lbl}>Role / Title</label><input style={C.inp(false)} value={ex.role} onChange={e=>updExp(i,"role",e.target.value)} placeholder="Senior Engineer"/></div></div>
+              <div className="rai-g2" style={{...C.g2,marginBottom:11}}><div><label style={C.lbl}>Company</label><input style={C.inp(false)} value={ex.company} onChange={e=>updExp(i,"company",e.target.value)} placeholder="Acme Corp"/></div><div><label style={C.lbl}>Role / Title</label><input style={C.inp(false)} value={ex.role} onChange={e=>updExp(i,"role",e.target.value)} placeholder="Senior Engineer"/></div></div>
               <div style={{marginBottom:11}}><label style={C.lbl}>Duration</label><input style={C.inp(false)} value={ex.duration} onChange={e=>updExp(i,"duration",e.target.value)} placeholder="Jan 2022 – Present"/></div>
               <div><label style={C.lbl}>Description</label><textarea style={C.ta} value={ex.description} onChange={e=>updExp(i,"description",e.target.value)} placeholder="Key responsibilities and achievements..."/></div>
             </div>
@@ -553,7 +551,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
                 <span style={{fontSize:11,fontWeight:700,color:"#818cf8",letterSpacing:"0.5px"}}>EDUCATION {i+1}</span>
                 {form.education.length>1&&<button style={{...C.btn("danger"),padding:"3px 10px",fontSize:10}} onClick={()=>remEdu(i)}>Remove</button>}
               </div>
-              <div style={C.g3}><div><label style={C.lbl}>School</label><input style={C.inp(false)} value={ed.school} onChange={e=>updEdu(i,"school",e.target.value)} placeholder="MIT"/></div><div><label style={C.lbl}>Degree</label><input style={C.inp(false)} value={ed.degree} onChange={e=>updEdu(i,"degree",e.target.value)} placeholder="B.Sc Computer Science"/></div><div><label style={C.lbl}>Year</label><input style={C.inp(false)} value={ed.year} onChange={e=>updEdu(i,"year",e.target.value)} placeholder="2022"/></div></div>
+              <div className="rai-g3" style={C.g3}><div><label style={C.lbl}>School</label><input style={C.inp(false)} value={ed.school} onChange={e=>updEdu(i,"school",e.target.value)} placeholder="MIT"/></div><div><label style={C.lbl}>Degree</label><input style={C.inp(false)} value={ed.degree} onChange={e=>updEdu(i,"degree",e.target.value)} placeholder="B.Sc Computer Science"/></div><div><label style={C.lbl}>Year</label><input style={C.inp(false)} value={ed.year} onChange={e=>updEdu(i,"year",e.target.value)} placeholder="2022"/></div></div>
             </div>
           ))}
           <button style={C.btn("o")} onClick={addEdu}>+ Add Education</button>
@@ -955,11 +953,11 @@ Candidate Skills: ${form.skills.join(", ")}`,
             }
           </div>
           {showForm&&<div>
-            <div style={{...C.g2,marginBottom:12}}>
+            <div className="rai-g2" style={{...C.g2,marginBottom:12}}>
               <div><label style={C.lbl}>Company *</label><input style={C.inp(false)} value={newJob.company} onChange={e=>setNewJob(j=>({...j,company:e.target.value}))} placeholder="Google"/></div>
               <div><label style={C.lbl}>Role / Title *</label><input style={C.inp(false)} value={newJob.role} onChange={e=>setNewJob(j=>({...j,role:e.target.value}))} placeholder="Software Engineer"/></div>
             </div>
-            <div style={{...C.g3,marginBottom:12}}>
+            <div className="rai-g3" style={{...C.g3,marginBottom:12}}>
               <div><label style={C.lbl}>Location</label><input style={C.inp(false)} value={newJob.location} onChange={e=>setNewJob(j=>({...j,location:e.target.value}))} placeholder="Bangalore / Remote"/></div>
               <div><label style={C.lbl}>Salary / CTC</label><input style={C.inp(false)} value={newJob.salary} onChange={e=>setNewJob(j=>({...j,salary:e.target.value}))} placeholder="₹12 LPA"/></div>
               <div><label style={C.lbl}>Applied Date</label><input type="date" style={C.inp(false)} value={newJob.date} onChange={e=>setNewJob(j=>({...j,date:e.target.value}))}/></div>
@@ -1126,11 +1124,11 @@ Candidate Skills: ${form.skills.join(", ")}`,
             <button style={C.btn("g")} onClick={()=>{setJForm(false);setEditEntry(null);setEntry(BLANK_ENTRY);}}>Cancel</button>
           </div>
 
-          <div style={{...C.g2,marginBottom:12}}>
+          <div className="rai-g2" style={{...C.g2,marginBottom:12}}>
             <div><label style={C.lbl}>Company *</label><input style={C.inp(false)} value={entry.company} onChange={e=>setEntry(j=>({...j,company:e.target.value}))} placeholder="Google"/></div>
             <div><label style={C.lbl}>Role *</label><input style={C.inp(false)} value={entry.role} onChange={e=>setEntry(j=>({...j,role:e.target.value}))} placeholder="Software Engineer"/></div>
           </div>
-          <div style={{...C.g3,marginBottom:16}}>
+          <div className="rai-g3" style={{...C.g3,marginBottom:16}}>
             <div><label style={C.lbl}>Date</label><input type="date" style={C.inp(false)} value={entry.date} onChange={e=>setEntry(j=>({...j,date:e.target.value}))}/></div>
             <div>
               <label style={C.lbl}>Round</label>
@@ -1187,22 +1185,40 @@ Candidate Skills: ${form.skills.join(", ")}`,
     <div style={C.app}>
       <style>{GF}</style>
       <style>{`
+        *{box-sizing:border-box;}
         input:focus,textarea:focus{border-color:#6366f1!important;box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
         button:not(:disabled):hover{opacity:0.82;transform:translateY(-1px);}
         button:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;}
         ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#080710;}::-webkit-scrollbar-thumb{background:#161428;border-radius:3px;}
+        @media(max-width:768px){
+          .rai-main{padding:10px 8px!important;max-width:100%!important;}
+          .rai-hdr{padding:10px 14px!important;flex-wrap:wrap;gap:6px;}
+          .rai-steps{flex-direction:row!important;overflow-x:auto!important;gap:6px!important;padding-bottom:4px;flex-wrap:nowrap!important;}
+          .rai-steps>div{min-width:80px!important;font-size:10px!important;padding:7px 8px!important;white-space:nowrap;}
+          .rai-card{padding:14px!important;border-radius:10px!important;}
+          .rai-g2,.rai-g3{grid-template-columns:1fr!important;}
+          .rai-navrow{flex-wrap:wrap;gap:8px;margin-top:16px!important;}
+          .rai-aitabs{flex-wrap:wrap!important;gap:4px!important;}
+          .rai-aitab{font-size:10px!important;padding:5px 8px!important;}
+          input,textarea,select{font-size:16px!important;}
+          button{min-height:40px;}
+        }
+        @media(max-width:480px){
+          .rai-logo{font-size:18px!important;}
+          .rai-card{padding:10px!important;}
+        }
       `}</style>
-      <div style={C.hdr}>
-        <div style={C.logo}>Resume<span style={C.acc}>AI</span><span style={{fontSize:10,color:"#4b5563",marginLeft:8,fontFamily:"'Sora',sans-serif",fontWeight:400}}>v3</span></div>
+      <div className="rai-hdr" style={C.hdr}>
+        <div className="rai-logo" style={C.logo}>Resume<span style={C.acc}>AI</span><span style={{fontSize:10,color:"#4b5563",marginLeft:8,fontFamily:"'Sora',sans-serif",fontWeight:400}}>v3</span></div>
         <div style={{display:"flex",alignItems:"center",gap:14}}>
           <span style={{fontSize:11,color:"#6366f1",background:"#161428",border:"1px solid #2d2b50",borderRadius:20,padding:"3px 10px",opacity:saveMsg?1:0,transition:"opacity 0.4s"}}>{saveMsg}</span>
           <span style={{fontSize:11,color:"#374151"}}>Progress auto-saved</span>
         </div>
       </div>
-      <div style={C.main}>
-        <div style={C.steps}>{STEPS.map((s,i)=><div key={i} style={C.step(step===i,step>i)} onClick={()=>setStep(i)}>{step>i?"✓ ":""}{s}</div>)}</div>
+      <div className="rai-main" style={C.main}>
+        <div className="rai-steps" style={C.steps}>{STEPS.map((s,i)=><div key={i} style={C.step(step===i,step>i)} onClick={()=>setStep(i)}>{step>i?"✓ ":""}{s}</div>)}</div>
         {renderStep()}
-        <div style={C.navRow}>
+        <div className="rai-navrow" style={C.navRow}>
           {step>0?<button style={C.btn("g")} onClick={()=>setStep(s=>s-1)}>← Back</button>:<div/>}
           <span style={{fontSize:11,color:"#374151"}}>{step+1} / {STEPS.length}</span>
           {step<STEPS.length-1&&<button style={C.btn()} onClick={()=>{if(validate())setStep(s=>s+1);}}>Continue →</button>}
