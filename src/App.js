@@ -141,6 +141,7 @@ export default function ResumeAI(){
   const [jobMatch,setJobMatch]=useState(null);      // {matched:[],missing:[],score,tips}
   const [loading,setLoading]=useState({});
   const [aiTab,setAiTab]=useState("rewrite");
+  const [theme,setTheme]=useState("dark");
 
   // Auto-save
   useEffect(()=>{
@@ -454,31 +455,48 @@ Candidate Skills: ${form.skills.join(", ")}`,
   const atsScore=(()=>{const m=ai.ats?.match(/(\d{1,3})\/100/);return m?parseInt(m[1]):null;})();
   const atsColor=atsScore>=75?"#16a34a":atsScore>=50?"#d97706":"#dc2626";
 
+  // ── Theme palettes
+  const dk={
+    bg:"#080710",bg2:"#0e0c1a",bg3:"#161428",
+    border:"#161428",border2:"#2d2b50",
+    text:"#e8e6f0",text2:"#9ca3af",text3:"#4b5563",
+    accent:"#6366f1",accent2:"#818cf8",
+    cardBg:"#0e0c1a",hdrBg:"#080710",
+  };
+  const lt={
+    bg:"#f0f2ff",bg2:"#ffffff",bg3:"#e8eaf6",
+    border:"#d1d5db",border2:"#a5b4fc",
+    text:"#1a1a2e",text2:"#4b5563",text3:"#9ca3af",
+    accent:"#6366f1",accent2:"#4f46e5",
+    cardBg:"#ffffff",hdrBg:"#ffffff",
+  };
+  const T=theme==="dark"?dk:lt;
+
   // ── Styles
   const C={
-    app:{minHeight:"100vh",background:"#080710",fontFamily:"'Sora',sans-serif",color:"#e8e6f0"},
-    hdr:{background:"#080710",borderBottom:"1px solid #161428",padding:"16px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(12px)"},
-    logo:{fontFamily:"'Fraunces',serif",fontSize:"22px",fontWeight:900,color:"#e8e6f0"},
-    acc:{color:"#818cf8"},
-    main:{maxWidth:1180,margin:"0 auto",padding:"32px 20px"},
-    steps:{display:"flex",gap:6,marginBottom:32},
-    step:(a,d)=>({flex:1,padding:"9px 4px",textAlign:"center",fontSize:11,fontWeight:600,borderRadius:8,cursor:"pointer",letterSpacing:"0.4px",transition:"all 0.2s",background:a?"#6366f1":d?"#161428":"#0e0c1a",color:a?"#fff":d?"#818cf8":"#4b5563",border:a?"none":`1px solid ${d?"#2d2b50":"#161428"}`}),
-    card:{background:"#0e0c1a",border:"1px solid #161428",borderRadius:14,padding:26,marginBottom:18},
-    sTitle:{fontFamily:"'Fraunces',serif",fontSize:19,fontWeight:700,marginBottom:18,color:"#e8e6f0"},
-    lbl:{display:"block",fontSize:10,fontWeight:600,color:"#9ca3af",marginBottom:5,letterSpacing:"0.8px",textTransform:"uppercase"},
-    inp:(err)=>({width:"100%",background:"#080710",border:`1px solid ${err?"#dc2626":"#161428"}`,borderRadius:8,padding:"11px 13px",color:"#e8e6f0",fontSize:13,fontFamily:"'Sora',sans-serif",outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}),
-    ta:{width:"100%",background:"#080710",border:"1px solid #161428",borderRadius:8,padding:"11px 13px",color:"#e8e6f0",fontSize:13,fontFamily:"'Sora',sans-serif",outline:"none",resize:"vertical",minHeight:90,boxSizing:"border-box"},
+    app:{minHeight:"100vh",background:T.bg,fontFamily:"'Sora',sans-serif",color:T.text,transition:"background 0.3s,color 0.3s"},
+    hdr:{background:T.hdrBg,borderBottom:`1px solid ${T.border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(12px)"},
+    logo:{fontFamily:"'Fraunces',serif",fontSize:"22px",fontWeight:900,color:T.text},
+    acc:{color:T.accent2},
+    main:{maxWidth:1180,margin:"0 auto",padding:"24px 16px"},
+    steps:{display:"flex",gap:5,marginBottom:24,overflowX:"auto",paddingBottom:4},
+    step:(a,d)=>({minWidth:0,flex:1,padding:"10px 6px",textAlign:"center",fontSize:11,fontWeight:600,borderRadius:10,cursor:"pointer",letterSpacing:"0.3px",transition:"all 0.2s",whiteSpace:"nowrap",background:a?T.accent:d?T.bg3:T.bg2,color:a?"#fff":d?T.accent2:T.text3,border:a?"none":`1px solid ${d?T.border2:T.border}`}),
+    card:{background:T.cardBg,border:`1px solid ${T.border}`,borderRadius:16,padding:22,marginBottom:18,boxShadow:theme==="light"?"0 2px 12px rgba(99,102,241,0.07)":"none"},
+    sTitle:{fontFamily:"'Fraunces',serif",fontSize:20,fontWeight:700,marginBottom:18,color:T.text},
+    lbl:{display:"block",fontSize:11,fontWeight:600,color:T.text2,marginBottom:6,letterSpacing:"0.6px",textTransform:"uppercase"},
+    inp:(err)=>({width:"100%",background:T.bg,border:`1.5px solid ${err?"#dc2626":T.border}`,borderRadius:10,padding:"13px 14px",color:T.text,fontSize:15,fontFamily:"'Sora',sans-serif",outline:"none",boxSizing:"border-box",transition:"border-color 0.2s"}),
+    ta:{width:"100%",background:T.bg,border:`1.5px solid ${T.border}`,borderRadius:10,padding:"13px 14px",color:T.text,fontSize:15,fontFamily:"'Sora',sans-serif",outline:"none",resize:"vertical",minHeight:100,boxSizing:"border-box"},
     g2:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:13},
     g3:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:13},
-    btn:(v="p")=>({padding:"10px 22px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:600,fontSize:12,fontFamily:"'Sora',sans-serif",transition:"all 0.18s",letterSpacing:"0.3px",...({p:{background:"#6366f1",color:"#fff"},o:{background:"transparent",color:"#818cf8",border:"1px solid #2d2b50"},g:{background:"#161428",color:"#9ca3af"},success:{background:"#16a34a",color:"#fff"},warn:{background:"#d97706",color:"#fff"},danger:{background:"#9f1239",color:"#fff"}}[v])}),
-    tab:(a)=>({padding:"9px 16px",border:"none",cursor:"pointer",fontWeight:600,fontSize:11,fontFamily:"'Sora',sans-serif",letterSpacing:"0.4px",background:a?"#161428":"transparent",color:a?"#818cf8":"#4b5563",borderBottom:a?"2px solid #6366f1":"2px solid transparent",transition:"all 0.15s"}),
-    box:{background:"#080710",border:"1px solid #161428",borderRadius:10,padding:16,fontSize:13,lineHeight:1.8,color:"#cbd5e1",whiteSpace:"pre-wrap",maxHeight:280,overflowY:"auto",marginTop:14},
-    chip:{display:"inline-flex",alignItems:"center",background:"#161428",color:"#818cf8",border:"1px solid #2d2b50",borderRadius:20,padding:"4px 12px",fontSize:12,gap:6},
-    chipX:{background:"none",border:"none",color:"#6b7280",cursor:"pointer",padding:0,fontSize:13,lineHeight:1},
-    blk:{padding:18,background:"#080710",borderRadius:10,marginBottom:12,border:"1px solid #161428"},
-    navRow:{display:"flex",justifyContent:"space-between",marginTop:24,alignItems:"center"},
-    tCard:(a)=>({flex:1,padding:14,borderRadius:10,cursor:"pointer",textAlign:"center",border:a?"2px solid #6366f1":"1px solid #161428",background:a?"#161428":"#0e0c1a",transition:"all 0.15s"}),
-    errTxt:{color:"#f87171",fontSize:11,marginTop:4},
+    btn:(v="p")=>({padding:"12px 24px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,fontFamily:"'Sora',sans-serif",transition:"all 0.18s",letterSpacing:"0.3px",...({p:{background:T.accent,color:"#fff"},o:{background:"transparent",color:T.accent2,border:`1px solid ${T.border2}`},g:{background:T.bg3,color:T.text2},success:{background:"#16a34a",color:"#fff"},warn:{background:"#d97706",color:"#fff"},danger:{background:"#9f1239",color:"#fff"}}[v])}),
+    tab:(a)=>({padding:"10px 16px",border:"none",cursor:"pointer",fontWeight:600,fontSize:12,fontFamily:"'Sora',sans-serif",letterSpacing:"0.3px",background:a?T.bg3:"transparent",color:a?T.accent2:T.text3,borderBottom:a?`2px solid ${T.accent}`:"2px solid transparent",transition:"all 0.15s"}),
+    box:{background:T.bg,border:`1px solid ${T.border}`,borderRadius:10,padding:16,fontSize:14,lineHeight:1.9,color:T.text,whiteSpace:"pre-wrap",maxHeight:300,overflowY:"auto",marginTop:14},
+    chip:{display:"inline-flex",alignItems:"center",background:T.bg3,color:T.accent2,border:`1px solid ${T.border2}`,borderRadius:20,padding:"5px 13px",fontSize:13,gap:6},
+    chipX:{background:"none",border:"none",color:T.text3,cursor:"pointer",padding:0,fontSize:14,lineHeight:1},
+    blk:{padding:18,background:T.bg,borderRadius:10,marginBottom:12,border:`1px solid ${T.border}`},
+    navRow:{display:"flex",justifyContent:"space-between",marginTop:24,alignItems:"center",flexWrap:"wrap",gap:10},
+    tCard:(a)=>({flex:1,padding:16,borderRadius:12,cursor:"pointer",textAlign:"center",border:a?`2px solid ${T.accent}`:`1px solid ${T.border}`,background:a?T.bg3:T.cardBg,transition:"all 0.15s"}),
+    errTxt:{color:"#f87171",fontSize:12,marginTop:4},
   };
 
   const renderStep=()=>{
@@ -486,8 +504,8 @@ Candidate Skills: ${form.skills.join(", ")}`,
 
       // ── STEP 0: Profile ────────────────────────────────────────────────────
       case 0: return (<div>
-        <div style={C.card}>
-          <div style={C.sTitle}>Personal Information</div>
+        <div className="rai-card" style={C.card}>
+          <div className="rai-steptitle" style={C.sTitle}>Personal Information</div>
           <div style={{marginBottom:13}}>
             <label style={C.lbl}>Full Name *</label>
             <input style={C.inp(errors.name)} value={form.name} onChange={e=>upd("name",e.target.value)} placeholder="Jane Smith"/>
@@ -528,10 +546,10 @@ Candidate Skills: ${form.skills.join(", ")}`,
 
       // ── STEP 1: Experience ─────────────────────────────────────────────────
       case 1: return (<div>
-        <div style={C.card}>
-          <div style={C.sTitle}>Work Experience</div>
+        <div className="rai-card" style={C.card}>
+          <div className="rai-steptitle" style={C.sTitle}>Work Experience</div>
           {form.experience.map((ex,i)=>(
-            <div key={i} style={C.blk}>
+            <div key={i} className="rai-blk" style={C.blk}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
                 <span style={{fontSize:11,fontWeight:700,color:"#818cf8",letterSpacing:"0.5px"}}>POSITION {i+1}</span>
                 {form.experience.length>1&&<button style={{...C.btn("danger"),padding:"3px 10px",fontSize:10}} onClick={()=>remExp(i)}>Remove</button>}
@@ -543,10 +561,10 @@ Candidate Skills: ${form.skills.join(", ")}`,
           ))}
           <button style={C.btn("o")} onClick={addExp}>+ Add Experience</button>
         </div>
-        <div style={C.card}>
-          <div style={C.sTitle}>Education</div>
+        <div className="rai-card" style={C.card}>
+          <div className="rai-steptitle" style={C.sTitle}>Education</div>
           {form.education.map((ed,i)=>(
-            <div key={i} style={C.blk}>
+            <div key={i} className="rai-blk" style={C.blk}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
                 <span style={{fontSize:11,fontWeight:700,color:"#818cf8",letterSpacing:"0.5px"}}>EDUCATION {i+1}</span>
                 {form.education.length>1&&<button style={{...C.btn("danger"),padding:"3px 10px",fontSize:10}} onClick={()=>remEdu(i)}>Remove</button>}
@@ -559,8 +577,8 @@ Candidate Skills: ${form.skills.join(", ")}`,
       </div>);
 
       // ── STEP 2: Skills ─────────────────────────────────────────────────────
-      case 2: return (<div style={C.card}>
-        <div style={C.sTitle}>Skills</div>
+      case 2: return (<div className="rai-card" style={C.card}>
+        <div className="rai-steptitle" style={C.sTitle}>Skills</div>
         <label style={C.lbl}>Add skills — press Enter or click Add</label>
         <div style={{display:"flex",gap:10,marginBottom:14}}>
           <input style={{...C.inp(false),flex:1}} value={skillInput} onChange={e=>setSkillInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addSkill()} placeholder="e.g. React, Python, Leadership..."/>
@@ -568,19 +586,19 @@ Candidate Skills: ${form.skills.join(", ")}`,
         </div>
         <div style={{display:"flex",flexWrap:"wrap",gap:8,minHeight:52,background:"#080710",borderRadius:10,padding:14,border:"1px solid #161428"}}>
           {form.skills.length===0&&<span style={{color:"#374151",fontSize:12}}>Your skill tags will appear here...</span>}
-          {form.skills.map((s,i)=><span key={i} style={C.chip}>{s}<button style={C.chipX} onClick={()=>remSkill(i)}>✕</button></span>)}
+          {form.skills.map((s,i)=><span key={i} className="rai-chip" style={C.chip}>{s}<button style={C.chipX} onClick={()=>remSkill(i)}>✕</button></span>)}
         </div>
         <p style={{color:"#6b7280",fontSize:11,marginTop:10}}>💡 Include both technical skills and soft skills for the best ATS results.</p>
       </div>);
 
       // ── STEP 3: AI Tools ───────────────────────────────────────────────────
       case 3: return (<div>
-        <div style={C.card}>
-          <div style={C.sTitle}>Target Job Description</div>
+        <div className="rai-card" style={C.card}>
+          <div className="rai-steptitle" style={C.sTitle}>Target Job Description</div>
           <label style={C.lbl}>Paste job description (powers all AI features)</label>
           <textarea style={{...C.ta,minHeight:120}} value={jobDesc} onChange={e=>setJobDesc(e.target.value)} placeholder="Paste the full job description here for best results..."/>
         </div>
-        <div style={C.card}>
+        <div className="rai-card" style={C.card}>
           <div style={{display:"flex",gap:0,marginBottom:22,borderBottom:"1px solid #161428",overflowX:"auto",flexWrap:"nowrap"}}>
             {[["rewrite","✍️ Rewrite"],["ats","📊 ATS Score"],["scorecard","🎯 Scorecard"],["weakness","🔍 Weaknesses"],["salary","💰 Salary"],["jobmatch","🔗 Job Match"],["interview","🎤 Interview"],["cover","📝 Cover Letter"],["roast","🔥 Roast Me"]].map(([k,lbl])=>(
               <button key={k} style={C.tab(aiTab===k)} onClick={()=>setAiTab(k)}>{lbl}</button>
@@ -744,11 +762,11 @@ Candidate Skills: ${form.skills.join(", ")}`,
 
       // ── STEP 4: Preview & Export ───────────────────────────────────────────
       case 4: return (<div>
-        <div style={C.card}>
-          <div style={C.sTitle}>Choose Template</div>
+        <div className="rai-card" style={C.card}>
+          <div className="rai-steptitle" style={C.sTitle}>Choose Template</div>
           <div style={{display:"flex",gap:12}}>
             {TEMPLATES.map(t=>(
-              <div key={t.id} style={C.tCard(form.template===t.id)} onClick={()=>upd("template",t.id)}>
+              <div key={t.id} className="rai-tcard" style={C.tCard(form.template===t.id)} onClick={()=>upd("template",t.id)}>
                 <div style={{width:36,height:4,background:t.accent,borderRadius:2,margin:"0 auto 8px"}}/>
                 <div style={{fontSize:12,fontWeight:600,color:form.template===t.id?"#e8e6f0":"#6b7280"}}>{t.label}</div>
               </div>
@@ -780,7 +798,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
 
         {jobSuggestions&&<div>
           {/* Profile summary bar */}
-          <div style={{...C.card,background:"linear-gradient(135deg,#0a0f1a,#0e1220)",border:"1px solid #1e3a5f",marginBottom:18}}>
+          <div className="rai-card" style={{...C.card,background:"linear-gradient(135deg,#0a0f1a,#0e1220)",border:"1px solid #1e3a5f",marginBottom:18}}>
             <div style={{display:"flex",flexWrap:"wrap",gap:20,alignItems:"center"}}>
               <div>
                 <div style={{fontSize:10,color:"#6b7280",letterSpacing:"1px",textTransform:"uppercase",marginBottom:4}}>Best Match Title</div>
@@ -847,7 +865,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
           </div>
 
           {/* Quick search bar */}
-          <div style={C.card}>
+          <div className="rai-card" style={C.card}>
             <div style={{fontSize:12,fontWeight:700,color:"#9ca3af",letterSpacing:"1px",textTransform:"uppercase",marginBottom:14}}>⚡ Quick Search — Open All Platforms At Once</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
               {[
@@ -885,7 +903,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
         </div>
 
         {/* Pipeline */}
-        <div style={{...C.card,marginBottom:18}}>
+        <div className="rai-card" style={{...C.card,marginBottom:18}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
             <div style={{fontFamily:"'Fraunces',serif",fontSize:16,fontWeight:700,color:"#e8e6f0"}}>Application Pipeline</div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
@@ -944,7 +962,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
         </div>
 
         {/* Add/Edit form */}
-        <div style={C.card}>
+        <div className="rai-card" style={C.card}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
             <div style={{fontFamily:"'Fraunces',serif",fontSize:16,fontWeight:700,color:"#e8e6f0"}}>{editJob!==null?"✏️ Edit Application":"➕ Add New Application"}</div>
             {!showForm
@@ -1012,7 +1030,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
           if(!ent)return null;
           const fb=ent.aiFeedback;
           return (
-            <div style={C.card}>
+            <div className="rai-card" style={C.card}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
                 <div>
                   <div style={{fontFamily:"'Fraunces',serif",fontSize:18,fontWeight:700,color:"#e8e6f0"}}>{ent.role} @ {ent.company}</div>
@@ -1078,7 +1096,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
         {/* Journal list */}
         {!viewEntry&&!jForm&&<div>
           {journal.length===0?(
-            <div style={{...C.card,textAlign:"center",padding:"44px 0",color:"#4b5563",fontSize:13}}>
+            <div className="rai-card" style={{...C.card,textAlign:"center",padding:"44px 0",color:"#4b5563",fontSize:13}}>
               No interviews logged yet. Click "+ Log Interview" to start tracking your journey 🚀
             </div>
           ):(
@@ -1118,7 +1136,7 @@ Candidate Skills: ${form.skills.join(", ")}`,
         </div>}
 
         {/* Add / Edit form */}
-        {jForm&&<div style={C.card}>
+        {jForm&&<div className="rai-card" style={C.card}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
             <div style={{fontFamily:"'Fraunces',serif",fontSize:17,fontWeight:700,color:"#e8e6f0"}}>{editEntry!==null?"✏️ Edit Interview Entry":"📝 Log New Interview"}</div>
             <button style={C.btn("g")} onClick={()=>{setJForm(false);setEditEntry(null);setEntry(BLANK_ENTRY);}}>Cancel</button>
@@ -1186,33 +1204,42 @@ Candidate Skills: ${form.skills.join(", ")}`,
       <style>{GF}</style>
       <style>{`
         *{box-sizing:border-box;}
-        input:focus,textarea:focus{border-color:#6366f1!important;box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
-        button:not(:disabled):hover{opacity:0.82;transform:translateY(-1px);}
-        button:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;}
-        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#080710;}::-webkit-scrollbar-thumb{background:#161428;border-radius:3px;}
+        input:focus,textarea:focus{border-color:#6366f1!important;box-shadow:0 0 0 3px rgba(99,102,241,0.18);}
+        button:not(:disabled):active{transform:scale(0.97);}
+        button:disabled{opacity:0.4;cursor:not-allowed;}
+        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#6366f133;border-radius:3px;}
+        input,textarea,select{-webkit-appearance:none;}
         @media(max-width:768px){
-          .rai-main{padding:10px 8px!important;max-width:100%!important;}
-          .rai-hdr{padding:10px 14px!important;flex-wrap:wrap;gap:6px;}
-          .rai-steps{flex-direction:row!important;overflow-x:auto!important;gap:6px!important;padding-bottom:4px;flex-wrap:nowrap!important;}
-          .rai-steps>div{min-width:80px!important;font-size:10px!important;padding:7px 8px!important;white-space:nowrap;}
-          .rai-card{padding:14px!important;border-radius:10px!important;}
-          .rai-g2,.rai-g3{grid-template-columns:1fr!important;}
-          .rai-navrow{flex-wrap:wrap;gap:8px;margin-top:16px!important;}
-          .rai-aitabs{flex-wrap:wrap!important;gap:4px!important;}
-          .rai-aitab{font-size:10px!important;padding:5px 8px!important;}
-          input,textarea,select{font-size:16px!important;}
-          button{min-height:40px;}
+          .rai-main{padding:14px 12px!important;}
+          .rai-hdr{padding:12px 16px!important;}
+          .rai-steps{gap:4px!important;margin-bottom:16px!important;}
+          .rai-steps>div{font-size:10px!important;padding:8px 4px!important;border-radius:8px!important;}
+          .rai-card{padding:16px!important;border-radius:12px!important;}
+          .rai-g2,.rai-g3{grid-template-columns:1fr!important;gap:10px!important;}
+          .rai-navrow{margin-top:18px!important;}
+          .rai-navrow button{flex:1;justify-content:center;padding:14px!important;font-size:14px!important;}
+          input,textarea{font-size:16px!important;padding:14px!important;}
+          button{min-height:44px;touch-action:manipulation;}
+          .rai-aitabs{flex-wrap:wrap!important;gap:4px!important;padding-bottom:4px;}
+          .rai-aitabs button{font-size:11px!important;padding:8px 10px!important;border-radius:8px!important;border:1px solid transparent;}
+          .rai-logo{font-size:20px!important;}
+          .rai-steptitle{font-size:17px!important;}
+          .rai-chip{font-size:13px!important;padding:6px 13px!important;}
+          .rai-blk{padding:14px!important;}
+          .rai-tcard{padding:12px 8px!important;font-size:12px!important;}
         }
         @media(max-width:480px){
-          .rai-logo{font-size:18px!important;}
-          .rai-card{padding:10px!important;}
+          .rai-steps>div{font-size:9px!important;padding:7px 2px!important;}
+          .rai-card{padding:14px!important;}
         }
       `}</style>
       <div className="rai-hdr" style={C.hdr}>
-        <div className="rai-logo" style={C.logo}>Resume<span style={C.acc}>AI</span><span style={{fontSize:10,color:"#4b5563",marginLeft:8,fontFamily:"'Sora',sans-serif",fontWeight:400}}>v3</span></div>
-        <div style={{display:"flex",alignItems:"center",gap:14}}>
-          <span style={{fontSize:11,color:"#6366f1",background:"#161428",border:"1px solid #2d2b50",borderRadius:20,padding:"3px 10px",opacity:saveMsg?1:0,transition:"opacity 0.4s"}}>{saveMsg}</span>
-          <span style={{fontSize:11,color:"#374151"}}>Progress auto-saved</span>
+        <div className="rai-logo" style={C.logo}>Resume<span style={C.acc}>AI</span><span style={{fontSize:10,color:T.text3,marginLeft:8,fontFamily:"'Sora',sans-serif",fontWeight:400}}>v3</span></div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <span style={{fontSize:11,color:T.accent,background:T.bg3,border:`1px solid ${T.border2}`,borderRadius:20,padding:"3px 10px",opacity:saveMsg?1:0,transition:"opacity 0.4s"}}>{saveMsg}</span>
+          <button onClick={()=>setTheme(t=>t==="dark"?"light":"dark")} style={{background:T.bg3,border:`1px solid ${T.border}`,borderRadius:20,padding:"7px 14px",cursor:"pointer",fontSize:13,fontWeight:600,color:T.text,fontFamily:"'Sora',sans-serif",display:"flex",alignItems:"center",gap:6,transition:"all 0.2s"}}>
+            {theme==="dark"?"☀️ Light":"🌙 Dark"}
+          </button>
         </div>
       </div>
       <div className="rai-main" style={C.main}>
